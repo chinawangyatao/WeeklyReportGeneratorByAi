@@ -53,6 +53,9 @@
 
 选「确认写入文件」后,调用 `write_report` 写入 `reports/`。该工具会**再弹一次 y/n 确认**(写文件是不可逆操作),不要跳过。
 
+### 9. 存到腾讯文档(可选)
+如果用户想把周报存到腾讯文档,先问要不要存;要存就用 `connection_search` 查 `tencent-docs` 连接,找到创建文档的工具(如 `create_smartcanvas_by_mdx`),把周报 Markdown 作为 `mdx` 传入创建智能文档,把返回的文档链接给用户。腾讯文档相关错误码见 `docs/tencent-docs/SKILL.md`(如 400006 鉴权失败、400007 VIP 不足、400008 积分不足)。
+
 ## 报告格式(严格遵守)
 
 ```
@@ -84,3 +87,28 @@
 - 项目多选以用户回复为准,不要替用户选。
 - 写文件前必须经用户确认(第 8 步 + write_report 的 y/n)。
 - 输出 Markdown,中文,不用第一人称,简洁明了,避免冗长。
+
+## 腾讯文档 Excel 读写
+
+agent 接了腾讯文档 Excel 服务(`tencent-sheet` 连接),可读写腾讯在线表格:
+
+- **读取**:`sheet.get_sheet_info`(子表信息)、`sheet.get_cell_data`(区域数据,支持 CSV/公式)、`sheet.find`(查找文本)、`sheet.get_cell_style`(样式)。
+- **写入**:`sheet.set_cell_value`(单个)、`sheet.set_range_value`(批量)、`sheet.set_range_value_by_csv`(CSV 批量)。连续多次写入**必须用批量接口**(`set_range_value` / `set_range_value_by_csv`),不要循环调单值。
+- 用 `file_id` 或 `file_url` 标识文档;`file_id` 可用 `tencent-docs` 连接的 `manage.search_file` 搜索获取。
+- 行列索引从 0 开始。读写前先用 `connection_search` 查 `tencent-sheet` 连接找到对应工具。
+
+## 填到腾讯文档人力管理表
+
+用户要把"今天做了什么"填进腾讯文档时,走这个流程(用专用工具 `read_iteration_plan` / `write_today_work`,不要用 `connection_search` 的原始工具):
+
+1. `list_commits`(今天,按 git 作者)-> 拿今日提交 + 作者名(取 git config user.name)。
+2. `read_iteration_plan({ name: 作者名 })` 拉迭代规划表(【智旅产品中心】迭代规划事项说明):
+   - 返回 `needs_confirm` -> 用 `ask_question` 把 `candidates` 列给用户选(迭代表里可能有谐音/形近字,可多选,也可补充候选外的写法),用户选后再带 `confirm_names` 重调。
+   - 拿到本人当前两周迭代的计划事项(`is_current: true` 的)。
+3. 把今日提交归纳成"本日工作"摘要,可对照迭代计划(把提交对应到计划项)。
+4. 用 `ask_question` 把要写入的内容给用户确认。
+5. `write_today_work({ name: 作者名, work: 摘要 })` 写入人力管理表(【研发中心】人力管理)本人工作表的"每日工作"列:
+   - 返回 `needs_worksheet` -> 用 `ask_question` 让用户从候选工作表里选(或纠正名字),再带确认名字重调。
+   - 返回 `needs_mode`(今天已有非空记录)-> 用 `ask_question` 问覆盖(overwrite)/追加(append)/跳过,再带 `mode` 重调。
+   - 成功返回 `action: inserted|written|overwritten|appended` 和写入行号。
+6. 告诉用户写到哪张表、哪一行、是新增还是更新。

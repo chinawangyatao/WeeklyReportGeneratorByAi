@@ -65,6 +65,9 @@ npm run dev
 
 既可以在对话里用工具增删,也可以直接编辑这个文件。可用环境变量 `WEEKLY_PROJECTS_FILE` 覆盖其路径。
 
+### 腾讯文档 Token(可选)
+agent 接了腾讯文档 MCP,目前连了两个服务:通用文档(`agent/connections/tencent-docs.ts`,创建/搜索/读取/管理文档)和 Excel 表格(`agent/connections/tencent-sheet.ts`,读写单元格/区域)。Token 从 `.env` 的 `TENCENT_DOCS_TOKEN` 读取。运行 `npm run setup` 时会一并提示填写,或手动加到 `.env`。Token 获取: https://docs.qq.com/scenario/open-claw.html 。四个腾讯文档服务(通用/PPT/Word/Excel)共用同一 Token;需要 PPT/Word 精细编辑时复制连接文件改 url 即可。
+
 ## 使用流程
 
 在 TUI 里输入「生成周报」后,agent 会按下面的步骤一步步跟你交互:
@@ -144,6 +147,15 @@ my-agent/
 | `npm run build` | 构建可部署产物到 `.output/` |
 | `npm run start` | 运行构建产物(服务端,无 TUI) |
 | `npm run typecheck` | TypeScript 类型检查 |
+
+## 腾讯文档周报集成(人力管理 + 迭代规划)
+
+除通用 Excel 读写外,agent 还内置两个专用工具,接入两张固定表:
+
+- `write_today_work` -> 写入【研发中心】人力管理(`DUExWSVNLSG5Id3ZW`)本人工作表的"每日工作"列。按 git 作者名匹配工作表(找不到会让你选);同一日期已有记录会让你选覆盖/追加/跳过;新日期在表头下方插入新行(最新在上)。
+- `read_iteration_plan` -> 只读【智旅产品中心】迭代规划事项说明(`DREFpYWZTRE94U1ZY`,子表"最新-事项整理")。按名字找本人当前两周迭代的计划;负责人列可能有谐音/形近字,会列出候选让你确认。
+
+在 TUI 里说"把今天的工作填到腾讯文档"即可触发:拉今日提交 -> 拉迭代计划对照 -> 确认 -> 写入人力管理表。
 
 ## 常见问题
 
