@@ -8,11 +8,13 @@
   },
   "scripts": {
     "build": "eve build",
-    "dev": "eve dev",
-    "start": "eve start",
+    "dev": "node --env-file-if-exists=.env node_modules/eve/bin/eve.js dev",
+    "setup": "node scripts/setup-env.mjs",
+    "start": "node --env-file-if-exists=.env node_modules/eve/bin/eve.js start",
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^3.0.15",
     "@vercel/connect": "0.4.2",
     "ai": "^7.0.38",
     "eve": "^0.27.12",
@@ -28,5 +30,4 @@
   "engines": {
     "node": "24.x"
   }
-
 }

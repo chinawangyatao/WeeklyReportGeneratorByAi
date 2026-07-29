@@ -1,5 +1,6 @@
 node_modules
 .env*
+!.env.example
 .eve
 .vercel
 .next
@@ -8,3 +9,7 @@ node_modules
 dist
 .DS_Store
 *.tsbuildinfo
+
+# 周报 agent:本地项目注册表与生成的周报,不入库
+projects.json
+reports/
