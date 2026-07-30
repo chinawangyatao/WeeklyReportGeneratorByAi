@@ -5,10 +5,10 @@ import { todayISO } from "./dates";
 
 const SHEET_EP = "https://docs.qq.com/api/v6/sheet/mcp";
 
-// 固定的两张表
-export const HR_FILE_ID = "DUExWSVNLSG5Id3ZW"; // 人力管理(每人一个工作表,写每日工作)
-export const PLAN_FILE_ID = "DREFpYWZTRE94U1ZY"; // 迭代规划
-export const PLAN_SHEET_ID = "ogt349"; // 最新-事项整理
+// 固定的两张表(file_id 可用环境变量覆盖,换成使用者自己的表)
+export const HR_FILE_ID = process.env.WEEKLY_HR_FILE_ID ?? "DUExWSVNLSG5Id3ZW"; // 人力管理(每人一个工作表,写每日工作)
+export const PLAN_FILE_ID = process.env.WEEKLY_PLAN_FILE_ID ?? "DREFpYWZTRE94U1ZY"; // 迭代规划
+export const PLAN_SHEET_ID = process.env.WEEKLY_PLAN_SHEET_ID ?? "ogt349"; // 最新-事项整理
 
 let sessionId: string | null = null;
 let idCounter = 0;

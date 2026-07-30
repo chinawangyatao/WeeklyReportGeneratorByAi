@@ -21,21 +21,25 @@
 
 ## 快速开始
 
+clone 后一条命令搞定(确保 Node 24 + 装依赖 + 配置 key):
+
 ```bash
-# 1. 切到 Node 24(系统装了 nvm 的话)
-nvm use 24
-
-# 2. 安装依赖(用 npm,不要用 bun)
-npm install
-
-# 3. 交互式配置 DeepSeek API key(写入 .env,已 gitignore)
-npm run setup
-
-# 4. 启动本地 TUI
+git clone <你的仓库地址>
+cd my-agent
+./install.sh        # Node 24 + npm install + 交互式配 key
 npm run dev
 ```
 
-启动后在提示符里输入「生成周报」即可开始。
+或手动:
+
+```bash
+nvm use 24          # 需要 Node 24,不能用 bun
+npm install
+npm run setup       # 交互式配 DeepSeek + 腾讯文档 key
+npm run dev
+```
+
+启动后在提示符里输入「生成周报」或「查看需求/迭代」即可开始。
 
 ## 配置
 
@@ -154,6 +158,8 @@ my-agent/
 
 - `write_today_work` -> 写入【研发中心】人力管理(`DUExWSVNLSG5Id3ZW`)本人工作表的"每日工作"列。按 git 作者名匹配工作表(找不到会让你选);同一日期已有记录会让你选覆盖/追加/跳过;新日期在表头下方插入新行(最新在上)。
 - `read_iteration_plan` -> 只读【智旅产品中心】迭代规划事项说明(`DREFpYWZTRE94U1ZY`,子表"最新-事项整理")。按名字找本人当前两周迭代的计划;负责人列可能有谐音/形近字,会列出候选让你确认。
+
+> 默认 file_id 是作者的表。换成你自己的表,在 `.env` 设 `WEEKLY_HR_FILE_ID` / `WEEKLY_PLAN_FILE_ID` / `WEEKLY_PLAN_SHEET_ID`(链接里 `/sheet/` 后是 file_id,`tab=` 后是子表 id)。
 
 在 TUI 里说"把今天的工作填到腾讯文档"即可触发:拉今日提交 -> 拉迭代计划对照 -> 确认 -> 写入人力管理表。
 
