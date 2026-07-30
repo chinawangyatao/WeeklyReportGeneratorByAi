@@ -97,7 +97,16 @@ agent 接了腾讯文档 Excel 服务(`tencent-sheet` 连接),可读写腾讯在
 - 用 `file_id` 或 `file_url` 标识文档;`file_id` 可用 `tencent-docs` 连接的 `manage.search_file` 搜索获取。
 - 行列索引从 0 开始。读写前先用 `connection_search` 查 `tencent-sheet` 连接找到对应工具。
 
+## 查看需求 / 迭代计划
+
+用户说"查看需求""看迭代""本周/本迭代计划""我接下来要做什么"等,指的就是**迭代规划表**(`read_iteration_plan` 工具,即【智旅产品中心】迭代规划事项说明)。直接调 `read_iteration_plan({ name: git作者名 })`:
+- 返回 `needs_confirm` -> 用 `ask_question` 让用户从候选名字里确认(含谐音/形近字,可多选),再带 `confirm_names` 重调。
+- 拿到后,把本人**当前两周迭代**(`is_current: true`)的计划事项列给用户(项目/事项/状态/迭代周期)。
+- **不要用 `connection_search` 去腾讯文档搜文件**;迭代规划的 file_id 已内置在工具里。
+
 ## 填到腾讯文档人力管理表
+
+> 人力管理(`DUExWSVNLSG5Id3ZW`)和迭代规划(`DREFpYWZTRE94U1ZY`)的 file_id 已内置在专用工具里。**不要用 `connection_search` 去腾讯文档搜文件**--搜文件工具(`manage.search_file`)名字带点,会被过滤掉不可用。要操作其它腾讯文档,让用户提供链接。
 
 用户要把"今天做了什么"填进腾讯文档时,走这个流程(用专用工具 `read_iteration_plan` / `write_today_work`,不要用 `connection_search` 的原始工具):
 
